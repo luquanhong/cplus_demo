@@ -1,0 +1,265 @@
+//
+//  main.cpp
+//  cplus
+//
+//  Created by 卢泉鸿 on 16/7/16.
+//  Copyright © 2016年 卢泉鸿. All rights reserved.
+//
+
+#include <iostream>
+#include <string>
+#include <unistd.h>
+
+#include "refcount_ptr.h"
+#include "normal_ptr.h"
+#include "MessageLoop.h"
+
+
+using namespace std;
+using namespace turbo;
+
+
+
+class CBase;
+
+class Obj{
+
+public:
+    Obj(){cout << __FUNCTION__ << endl;}
+    ~Obj(){cout << __FUNCTION__ << endl;}
+    virtual void func1(){}
+};
+
+class DemoClass {
+    
+public:
+    DemoClass(){}
+    ~DemoClass(){}
+    
+    void test(){
+        
+    }
+};
+
+class Base : public MessageLoop,public Obj{
+public:
+    Base()
+    :MessageLoop()
+    , count(10)
+    {
+        MessageLoop::start();
+        cout << "Base constor" << endl;
+    }
+    
+    virtual ~Base()
+    {
+        MessageLoop::stop();
+        cout << "~Base destrutor" << endl;
+    }
+    
+    
+    
+    void func();
+    
+    
+   
+public:
+    class BaseMessage : public MessageLoop::Message {
+    public:
+        BaseMessage(normal_ptr<Base> base) {
+            this->pb = base;
+        }
+        
+        virtual void onMessage() {
+            pb->onBaseMessage(pb);
+        }
+        
+    private:
+        normal_ptr<Base> pb;
+    };
+    
+    //refcount_ptr<BaseMessage> bMessage;
+    void onBaseMessage(const normal_ptr<Base>& base);
+    
+    virtual void func1();
+    
+    void func2(const refcount_ptr<CBase>& cb);
+    
+    static void* test_thread(void* args);
+ 
+public:
+    class Base1Message : public MessageLoop::Message {
+    public:
+        Base1Message(normal_ptr<Base> base) {
+            this->pb = base;
+        }
+        
+        virtual void onMessage() {
+            pb->onBase1Message();
+        }
+        
+    private:
+        normal_ptr<Base> pb;
+    };
+    
+    void onBase1Message();
+
+private:
+    int count;
+    
+    refcount_ptr<CBase> c;
+    
+};
+
+void Base::onBaseMessage(const normal_ptr<Base>& base){
+    cout << __FUNCTION__ << endl;
+    
+    //sleep(5);
+    
+    //count = 100;
+    
+    //refcount_ptr<CBase> cc = c;
+    
+    cout << __FUNCTION__ << " 1 " << endl;
+    sleep(2);
+    cout << __FUNCTION__ << " 2 " <<endl;
+    
+    refcount_ptr<CBase> cc = c;
+    sleep(3);
+    if (c) {
+        cout << " cc " << endl;
+        printf("cc is cc.get = %p\n", c.get());
+    }
+        
+    cout << __FUNCTION__ << " 3 " <<endl;
+    
+    sleep(10);
+    
+    cout << "onBaseMessage count: " << count << endl;
+    
+    cout << __FUNCTION__ << " end "<< endl;
+}
+
+
+void Base::func() {
+    cout << __FUNCTION__ << endl;
+    
+    refcount_ptr<MessageLoop::Message> bMessage = new BaseMessage(this);
+    
+    MessageLoop::postMessage(bMessage);
+    
+    //func1(bMessage);
+
+    cout << __FUNCTION__ << " end "<< endl;
+    
+}
+
+void Base::onBase1Message()
+{
+    cout << __FUNCTION__ << endl;
+    
+    sleep(5);
+    
+    //count = 100;
+    
+    cout << "count: " << count << endl;
+    
+    cout << __FUNCTION__ << " end "<< endl;
+}
+
+void Base::func1()
+{
+    cout << __FUNCTION__ << endl;
+    
+    refcount_ptr<MessageLoop::Message> bMessage = new Base1Message(this);
+    
+    MessageLoop::postMessage(bMessage);
+    
+    //func1(bMessage);
+    
+    cout << __FUNCTION__ << " end "<< endl;
+}
+
+void Base::func2(const refcount_ptr<CBase>& cb)
+{
+    
+#if 0
+    cout << __FUNCTION__ << " 1 end "<< endl;
+    c = cb;
+    cout << __FUNCTION__ << " 2 end "<< endl;
+    
+    refcount_ptr<MessageLoop::Message> bMessage = new BaseMessage(this);
+    
+    MessageLoop::postMessage(bMessage);
+    
+    sleep(1);
+    
+    cout << __FUNCTION__ << " 3 end "<< endl;
+    
+    c = NULL;
+#endif
+    
+    pthread_t thread;
+    pthread_create(&thread, NULL, test_thread, this);
+    
+    
+    cout << __FUNCTION__ << " 4 end "<< endl;
+}
+
+
+
+class CBase : public Obj{
+
+public:
+    CBase() {
+        cout << __FUNCTION__ << endl;
+    }
+    
+    ~CBase() {
+        cout << __FUNCTION__ << endl;
+    }
+    
+private:
+    int count;
+
+};
+
+
+void function1()
+{
+    refcount_ptr<Base> base = new Base();
+
+#if 0
+    //base->func();
+    
+    //base->func1();
+    
+    
+    //sleep(1);
+    
+    //base = new CBase();
+#endif
+    
+    refcount_ptr<CBase> cb = new CBase();
+    
+    cout << __FUNCTION__ << " 1 end " << endl;
+    
+    base->func2(cb);
+    
+    cout << __FUNCTION__ << " 2 end " << endl;
+}
+
+
+
+
+
+int main(int argc, const char * argv[]) {
+    // insert code here...
+    std::cout << "Hello, World!\n";
+    
+    function1();
+    
+    getchar();
+    return 0;
+}
+ 

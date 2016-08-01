@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bucket
+   type = "1"
+   version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "cplus/turbo/inc/refcount_ptr.h"
+            timestampString = "490466301.432565"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "270"
+            endingLineNumber = "270"
+            landmarkName = "_cleanupIfLastInstance()"
+            landmarkType = "5">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "turbo::refcount_ptr&lt;Base&gt;::_cleanupIfLastInstance()"
+                  moduleName = "cplus"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/luquanhong/WorkSpace/github/cplus_demo/cplus/cplus/turbo/inc/refcount_ptr.h"
+                  timestampString = "490466446.718543"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "270"
+                  endingLineNumber = "270"
+                  offsetFromSymbolStart = "16">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "turbo::refcount_ptr&lt;MessageLoop::Message&gt;::_cleanupIfLastInstance()"
+                  moduleName = "cplus"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/luquanhong/WorkSpace/github/cplus_demo/cplus/cplus/turbo/inc/refcount_ptr.h"
+                  timestampString = "490466446.718903"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "270"
+                  endingLineNumber = "270"
+                  offsetFromSymbolStart = "16">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "turbo::refcount_ptr&lt;Obj&gt;::_cleanupIfLastInstance()"
+                  moduleName = "cplus"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/luquanhong/WorkSpace/github/cplus_demo/cplus/cplus/turbo/inc/refcount_ptr.h"
+                  timestampString = "490466446.720164"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "270"
+                  endingLineNumber = "270"
+                  offsetFromSymbolStart = "16">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
+</Bucket>
