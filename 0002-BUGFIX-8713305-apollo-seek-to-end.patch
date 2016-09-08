@@ -1,0 +1,64 @@
+From fc9c53a7cab42d6086bd61f13cc62bb2cd4924b9 Mon Sep 17 00:00:00 2001
+From: luquanhong <quanhong.lqh@alibaba-inc.com>
+Date: Mon, 15 Aug 2016 19:34:44 +0800
+Subject: [PATCH 2/3] =?UTF-8?q?BUGFIX:8713305:apollo=20seek=20to=20end?=
+ =?UTF-8?q?=E7=9A=84=E9=97=AE=E9=A2=98=20ROOTCAUSE:=20=5FisNearlyEndedSeek?=
+ =?UTF-8?q?=20=E6=B2=A1=E6=9C=89=E5=A4=8D=E4=BD=8D=20SOLUTION:=20=E5=A4=8D?=
+ =?UTF-8?q?=E4=BD=8D=5FisNearlyEndedSeek?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Change-Id: Iad6a0eb6acc8e8d8d76602bec9977f546255acea
+
+Conflicts:
+	core/u3player_core
+---
+ .../app/src/main/java/com/UCMobile/Apollo/MediaPlayer.java    |  1 +
+ sdk-android/ApolloSDK/jni/com_UCMobile_Apollo_MediaPlayer.cpp | 11 +++++++++++
+ 2 files changed, 12 insertions(+)
+
+diff --git a/sdk-android/ApolloSDK/app/src/main/java/com/UCMobile/Apollo/MediaPlayer.java b/sdk-android/ApolloSDK/app/src/main/java/com/UCMobile/Apollo/MediaPlayer.java
+index 7ad62a2..d083007 100644
+--- a/sdk-android/ApolloSDK/app/src/main/java/com/UCMobile/Apollo/MediaPlayer.java
++++ b/sdk-android/ApolloSDK/app/src/main/java/com/UCMobile/Apollo/MediaPlayer.java
+@@ -676,6 +676,7 @@ public class MediaPlayer
+ 
+         _state = State.IDLE;
+               
++        _isNearlyEndedSeek = false;
+         _screenOn = false;
+         _permitScreenOn = false;
+         _checkScreenOn();
+diff --git a/sdk-android/ApolloSDK/jni/com_UCMobile_Apollo_MediaPlayer.cpp b/sdk-android/ApolloSDK/jni/com_UCMobile_Apollo_MediaPlayer.cpp
+index 54134ee..38c75b5 100755
+--- a/sdk-android/ApolloSDK/jni/com_UCMobile_Apollo_MediaPlayer.cpp
++++ b/sdk-android/ApolloSDK/jni/com_UCMobile_Apollo_MediaPlayer.cpp
+@@ -391,6 +391,8 @@ struct MediaPlayerInstance : public r2::MediaPlayerObserver, public r2::DeferDes
+ 
+     bool _isBuffering;
+ 
++    int _curPosition;
++
+     // callback to java
+ public:
+     bool statUpload(ApolloStat* stat);
+@@ -1069,6 +1071,15 @@ int MediaPlayerInstance::nativeGetCurrentPosition(JNIEnv* env, jobject mp)
+ 
+     int currentPosition = 0;
+     currentPosition = player->getPositionUs() / 1000LL;
++    Logger::i(LOG_TAG, " _curPosition = %d nativeGetCurrentPosition: %d\n ", _curPosition, currentPosition);
++    if ( _curPosition == currentPosition) {
++        // FIXME:lqh  
++        Logger::e(LOG_TAG, "nativeGetCurrentPosition: same\n ");
++        currentPosition += 10;
++    } 
++
++    _curPosition = currentPosition;
++    
+     return currentPosition;
+ }
+ 
+-- 
+1.9.1
+
