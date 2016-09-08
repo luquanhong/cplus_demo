@@ -1,0 +1,204 @@
+diff --git a/core/u3player_core b/core/u3player_core
+index 62855b0..13cb6a1 160000
+--- a/core/u3player_core
++++ b/core/u3player_core
+@@ -1 +1 @@
+-Subproject commit 62855b0f12be52c9f2e8b472715cab67f9f2196c
++Subproject commit 13cb6a1af245eb0841b079fb0e7304c1351d541d
+diff --git a/r2/d2/android/inc/AndroidJavaMediaCodecCompatible.h b/r2/d2/android/inc/AndroidJavaMediaCodecCompatible.h
+new file mode 100755
+index 0000000..4294f99
+--- /dev/null
++++ b/r2/d2/android/inc/AndroidJavaMediaCodecCompatible.h
+@@ -0,0 +1,60 @@
++
++/* qualcom */
++// Adreno 203     850x480
++{ "MSM8625",    850, 480 },
++{ "MSM8225",    850, 480 },
++{ "MSM8225Q",   850, 480 },
++{ "MSM8625Q",   850, 480 },
++
++// Adreno 305   1080p
++
++{ "APQ8060A",   1920, 1080 },
++{ "MSM8960",    1920, 1080 },
++{ "MSM8660A",   1920, 1080 },
++{ "MSM8260A",   1920, 1080 },
++{ "APQ8030",    1920, 1080 },
++{ "MSM8930",    1920, 1080 },
++{ "MSM8630",    1920, 1080 },
++{ "MSM8230",    1920, 1080 },
++{ "MSM8627",    1920, 1080 },
++{ "MSM8227",    1920, 1080 },
++{ "8030AB",     1920, 1080 },
++{ "8226",       1920, 1080 },
++{ "8626",       1920, 1080 },
++
++
++// Adreno 320   1080p
++{ "APQ8064",    1920, 1080 },
++{ "MSM8960T",   1920, 1080 },
++{ "MPQ8064",    1920, 1080 },
++{ "8064T",      1920, 1080 },
++
++
++// Adreno 200   720p
++{ "QSD8250",    1280, 720  },
++{ "QSD8650",    1280, 720  },
++{ "MSM7227",    1280, 720  },
++{ "MSM7627",    1280, 720  },
++{ "MSM7227A",   1280, 720  },
++{ "MSM7627A",   1280, 720  },
++{ "MSM7625",    1280, 720  },
++{ "MSM7225",    1280, 720  },
++{ "MSM7625A",   1280, 720  },
++{ "MSM7225A",   1280, 720  },
++
++//Adreno 205    720p
++{ "MSM8655",    1280, 720  },
++{ "MSM8255",    1280, 720  },
++{ "APQ8055",    1280, 720  },
++{ "MSM7630",    1280, 720  },
++{ "MSM7230",    1280, 720  },
++
++// Adreno 220   1080p    
++{ "MSM8660",   1920, 1080 },
++{ "MSM8260",   1920, 1080 },
++{ "APQ8060",   1920, 1080 },
++    
++
++
++
++
+diff --git a/r2/d2/android/inc/AndroidJavaMediaCodecJni.h b/r2/d2/android/inc/AndroidJavaMediaCodecJni.h
+index a85cbdf..dd64846 100755
+--- a/r2/d2/android/inc/AndroidJavaMediaCodecJni.h
++++ b/r2/d2/android/inc/AndroidJavaMediaCodecJni.h
+@@ -26,6 +26,7 @@ using namespace std;
+ #include "AndroidJavaMediaFormat.h"
+ #include "PlatformData.h"
+ 
++
+ namespace d2{
+ 
+ using namespace r2;
+@@ -61,6 +62,15 @@ using namespace turbo;
+ #define PROFILE_H264_MVC_MULTIVIEW_HIGH   118
+ 
+ 
++static const struct 
++{
++    const char*     hardware;
++    int             max_resolution;
++} omx_compatible_table[] = {
++#include "AndroidJavaMediaCodecCompatible.h"
++};
++
++
+ typedef enum OMX_VIDEO_AVCPROFILETYPE {
+     OMX_VIDEO_AVCProfileBaseline = 0x01,   /**< Baseline profile */
+     OMX_VIDEO_AVCProfileMain     = 0x02,   /**< Main profile */
+@@ -110,14 +120,7 @@ typedef struct MediacodecCheckInfo {
+     int mRank;
+ }MediacodecCheckInfo;
+ 
+-static const struct 
+-{
+-    const char*     model;
+-    int             max_resolution;
+-} omx_compatible_table[] = {
+-    { "MI 2SC",         1920 },
+-    { "Lenovo K860i",   1920 },
+-};
++
+ 
+ class AndroidJavaMediaCodecJni;
+ 
+@@ -244,6 +247,7 @@ private:
+     bool checkException(JNIEnv *env);
+     void initKnownCodecList();
+     bool checkCompatible(int width, int height);
++    bool getDeviceHardware(string& name);
+ 
+     virtual void runStopDecoderInThread();
+     virtual void runCreateDecoderInThread();
+@@ -285,6 +289,7 @@ private:
+     AndroidJavaMediaCodecJniRefHolder* _refHolder;
+ 
+     turbo::Mutex _refHolderLock;
++    string _hardwareName;
+ 
+ }; // AndroidJavaMediaCodecJni
+ 
+diff --git a/r2/d2/android/src/AndroidJavaMediaCodecJni.cpp b/r2/d2/android/src/AndroidJavaMediaCodecJni.cpp
+index 07d6823..a4c78c7 100755
+--- a/r2/d2/android/src/AndroidJavaMediaCodecJni.cpp
++++ b/r2/d2/android/src/AndroidJavaMediaCodecJni.cpp
+@@ -2,6 +2,9 @@
+ #include <AudioFormat.h>
+ #include <AudioBuffer.h>
+ #include <Logger.h>
++#include <iostream>
++#include <fstream>
++
+ 
+ extern "C" {
+ #include <libavformat/avformat.h>
+@@ -114,6 +117,7 @@ namespace d2{
+ 
+ using namespace r2;
+ using namespace turbo;
++using namespace std;
+ 
+ int AndroidJavaMediaCodecJni::RANK_NO_SENSE = 0;
+ int AndroidJavaMediaCodecJni::RANK_NON_STANDARD = 100;
+@@ -272,6 +276,8 @@ bool AndroidJavaMediaCodecJni::checkCompatible(int width, int height)
+     for (i = 0; i < sizeof(omx_compatible_table)/sizeof(omx_compatible_table[0]); i++) {
+         string model = GraphicsBufferCDParams::getMobileModel();
+         const char* destModel = omx_compatible_table[i].model;
++
++        Logger::e(TAG, "checkCompatible resolution = %s  and %d x %d \n",  destModel, width, height);
+         if (!strncasecmp(model.c_str(), destModel, strlen(destModel))) {
+             resolution = omx_compatible_table[i].max_resolution;
+             if (width > resolution || height > resolution) {
+@@ -281,6 +287,10 @@ bool AndroidJavaMediaCodecJni::checkCompatible(int width, int height)
+         }
+     }
+ 
++    if (getDeviceHardware(_hardwareName)) {
++
++    }
++
+     return true;
+ }
+ 
+@@ -1173,5 +1183,28 @@ void AndroidJavaMediaCodecJni::setRefHolder(AndroidJavaMediaCodecJniRefHolder* r
+     this->_refHolder = refHolder;
+ }
+ 
++bool AndroidJavaMediaCodecJni::getDeviceHardware(string& name)
++{
++    bool found = false;
++    string line;
++    ifstream cpuinfo("/proc/cpuinfo");
++    if (cpuinfo.is_open()) {
++        while ( getline(cpuinfo, line, '\n') ) {
++            if (line.find("Hardware") != string::npos) {
++                name = line;
++                found = true;
++                Logger::d(TAG, "%s:  %s", __FUNCTION__, _hardwareName.c_str());
++                break;
++            }
++        }
++
++        cpuinfo.close();
++    }
++
++    return found;
++}
++
++
++
+ 
+ }// d2
