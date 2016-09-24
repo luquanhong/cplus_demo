@@ -23,6 +23,22 @@ using namespace turbo;
 class CBase;
 class Base;
 
+class Statee{
+
+public:
+    Statee() {
+        cout << "Statee constor" << endl;
+    }
+    ~Statee() {
+        cout << "~Statee destrutor" << endl;
+    }
+
+    void print_state() {
+        printf("hello state\n");
+    }
+};
+
+
 class Listen{
 public:
     virtual refcount_ptr<Base>& lockObj() = 0;
@@ -99,12 +115,34 @@ public:
     };
     
     void onBase1Message();
+
+public:
+    void state_test();
     
+    class StateMessage : public MessageLoop::Message {
+    public:
+        StateMessage(normal_ptr<Base> base, refcount_ptr<Statee> state) {
+            this->pb = base;
+            this->state = state;
+        }
+        
+        virtual void onMessage() {
+            pb->onStateMessage(state);
+        }
+        
+    private:
+        normal_ptr<Base> pb;
+        refcount_ptr<Statee> state;
+    };
+    
+    void onStateMessage(refcount_ptr<Statee> state);
+
 private:
     int count;
     
     refcount_ptr<CBase> c;
     
+    refcount_ptr<Statee> state;
 };
 
 void Base::onBaseMessage( refcount_ptr<Base>& base){
@@ -119,6 +157,30 @@ void Base::onBaseMessage( refcount_ptr<Base>& base){
     base = NULL;
     
     cout << __FUNCTION__ << " end "<< endl;
+}
+
+void Base::state_test() {
+
+    // refcount_ptr<MessageLoop::Message> bMessage = new StateMessage(this, bb);
+    // MessageLoop::postMessage(bMessage);
+
+    state = new Statee();
+#if 0
+    onStateMessage(state);
+#else
+    refcount_ptr<MessageLoop::Message> bMessage = new StateMessage(this, state);
+    MessageLoop::postMessage(bMessage);
+#endif
+}
+
+void Base::onStateMessage(refcount_ptr<Statee> state){
+
+    cout << __FUNCTION__ << " enter "<< endl;
+    state->print_state();
+
+    sleep(3);
+
+     cout << __FUNCTION__ << " end "<< endl;
 }
 
 
@@ -234,13 +296,30 @@ void function1()
 }
 
 
+void function2()
+{
+    refcount_ptr<Base> cb;
+    
+    if (1) {
+        cout << __FUNCTION__ << "===== end " << endl;
+        cb = new Base();
+    
+        cb->state_test();    
+        cout << __FUNCTION__ << " 2 ======end " << endl;
+    }
+    
+    
+    cout << __FUNCTION__ << " 2 end " << endl;
+}
+
 int main(int argc, const char * argv[]) {
     // insert code here...
     std::cout << "Hello, World!\n";
     
-    function1();
+    // test selfloc 
+    //function1();
     
-    
+    function2();
     
     getchar();
     return 0;

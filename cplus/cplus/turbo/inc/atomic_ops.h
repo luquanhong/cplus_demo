@@ -23,6 +23,8 @@ typedef int32_t atomic_int32_t;
 #endif
 #endif
 
+typedef int32_t atomic_int32_t;
+
 namespace turbo {
 
 #undef __USE_GNUC_BUILTIN__
@@ -100,7 +102,7 @@ inline bool atomicCompareAndSwap32(int32_t oldValue, int32_t newValue, volatile 
 #endif // __ANDROID__
 
 // gcc fallback
-#if defined(__USE_GNUC_BUILTIN__) && defined(__GNUC__)
+//#if defined(__USE_GNUC_BUILTIN__) && defined(__GNUC__)
 
 inline int32_t atomicIncrement32(volatile int32_t* pValue)
 {
@@ -118,7 +120,7 @@ inline bool atomicCompareAndSwap32(int32_t oldValue, int32_t newValue, volatile 
     return __sync_bool_compare_and_swap(pValue, oldValue, newValue);
 }
 
-#endif // __USE_GNUC_BUILTIN__ && __GNUC__
+//#endif // __USE_GNUC_BUILTIN__ && __GNUC__
 
 } // namespace
 
