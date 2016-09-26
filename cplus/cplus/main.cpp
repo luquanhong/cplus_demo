@@ -121,7 +121,7 @@ public:
     
     class StateMessage : public MessageLoop::Message {
     public:
-        StateMessage(normal_ptr<Base> base, refcount_ptr<Statee> state) {
+        StateMessage(normal_ptr<Base> base, refcount_ptr<Statee>& state) {
             this->pb = base;
             this->state = state;
         }
@@ -135,7 +135,7 @@ public:
         refcount_ptr<Statee> state;
     };
     
-    void onStateMessage(refcount_ptr<Statee> state);
+    void onStateMessage(refcount_ptr<Statee>& state);
 
 private:
     int count;
@@ -163,17 +163,22 @@ void Base::state_test() {
 
     // refcount_ptr<MessageLoop::Message> bMessage = new StateMessage(this, bb);
     // MessageLoop::postMessage(bMessage);
+cout << __FUNCTION__ << " enter "<< endl;
 
     state = new Statee();
+    cout << __FUNCTION__ << " 1 "<< endl;
+    refcount_ptr<Statee> oldStat = state;
+    cout << __FUNCTION__ << " 2 "<< endl;
 #if 0
     onStateMessage(state);
 #else
     refcount_ptr<MessageLoop::Message> bMessage = new StateMessage(this, state);
     MessageLoop::postMessage(bMessage);
 #endif
+    cout << __FUNCTION__ << " exit "<< endl;
 }
 
-void Base::onStateMessage(refcount_ptr<Statee> state){
+void Base::onStateMessage(refcount_ptr<Statee>& state){
 
     cout << __FUNCTION__ << " enter "<< endl;
     state->print_state();
