@@ -1,0 +1,2 @@
+/home/jack/workstation/github/cplus_demo/cmake/CMakeSample/src/hello/CMakeFiles/hello.dir
+/home/jack/workstation/github/cplus_demo/cmake/CMakeSample/src/sample/CMakeFiles/sample.dir

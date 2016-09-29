@@ -1,0 +1,2 @@
+INCLUDE_DIRECTORIES(hello)
+SUBDIRS(hello sample)
