@@ -1,0 +1,1 @@
+/usr/bin/c++       CMakeFiles/demo2.dir/test.cpp.o CMakeFiles/demo2.dir/main.cpp.o  -o demo2 -rdynamic test1/libtest1.a 

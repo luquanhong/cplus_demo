@@ -1,0 +1,2 @@
+/home/jack/workstation/github/cplus_demo/cmake/demo2/CMakeFiles/demo2.dir
+/home/jack/workstation/github/cplus_demo/cmake/demo2/test1/CMakeFiles/test1.dir
