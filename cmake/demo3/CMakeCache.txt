@@ -195,6 +195,18 @@ demo3_SOURCE_DIR:STATIC=/home/jack/workstation/github/cplus_demo/cmake/demo3
 //The directory containing a CMake configuration file for libtest1.
 libtest1_DIR:PATH=libtest1_DIR-NOTFOUND
 
+//Path to a file.
+libtest1_INCLUDE_DIR:PATH=libtest1_INCLUDE_DIR-NOTFOUND
+
+//Path to a library.
+libtest1_LIBRARIE:FILEPATH=libtest1_LIBRARIE-NOTFOUND
+
+//Path to a library.
+libtest1_LIBRARIES:FILEPATH=libtest1_LIBRARIES-NOTFOUND
+
+//Path to a library.
+libtest1_LIBRARY:FILEPATH=libtest1_LIBRARY-NOTFOUND
+
 
 ########################
 # INTERNAL cache entries
@@ -331,4 +343,12 @@ CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
 LIBTEST_CXX_INCLUDE_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: LIBTEST_CXX_LIBRARIES
 LIBTEST_CXX_LIBRARIES-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: libtest1_INCLUDE_DIR
+libtest1_INCLUDE_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: libtest1_LIBRARIE
+libtest1_LIBRARIE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: libtest1_LIBRARIES
+libtest1_LIBRARIES-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: libtest1_LIBRARY
+libtest1_LIBRARY-ADVANCED:INTERNAL=1
 
